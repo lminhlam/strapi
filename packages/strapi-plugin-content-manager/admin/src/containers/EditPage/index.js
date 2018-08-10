@@ -59,6 +59,8 @@ export class EditPage extends React.Component {
 
   componentDidMount() {
     this.initComponent(this.props);
+    this.context.toggleLocaleDisplay();
+    this.context.toggleLogoutDisplay();
   }
 
   componentDidUpdate(prevProps) {
@@ -86,6 +88,8 @@ export class EditPage extends React.Component {
 
   componentWillUnmount() {
     this.props.resetProps();
+    this.context.toggleLocaleDisplay();
+    this.context.toggleLogoutDisplay();
   }
 
   /**
@@ -444,6 +448,8 @@ export class EditPage extends React.Component {
 }
 
 EditPage.contextTypes = {
+  toggleLocaleDisplay: PropTypes.func,
+  toggleLogoutDisplay: PropTypes.func,
   plugins: PropTypes.object,
 };
 

@@ -17,10 +17,8 @@ import { createStructuredSelector } from 'reselect';
 import { Switch, Route } from 'react-router-dom';
 import { get, includes, isFunction, map, omit } from 'lodash';
 import { compose } from 'redux';
-
 // Actions required for disabling and enabling the OverlayBlocker
 import { disableGlobalOverlayBlocker, enableGlobalOverlayBlocker } from 'actions/overlayBlocker';
-
 import { pluginLoaded, updatePlugin } from 'containers/App/actions';
 import {
   makeSelectBlockApp,
@@ -28,9 +26,7 @@ import {
   selectHasUserPlugin,
   selectPlugins,
 } from 'containers/App/selectors';
-
 import { hideNotification } from 'containers/NotificationProvider/actions';
-
 // Design
 import ComingSoonPage from 'containers/ComingSoonPage';
 import Content from 'containers/Content';
@@ -45,17 +41,19 @@ import Logout from 'components/Logout';
 import NotFoundPage from 'containers/NotFoundPage/Loadable';
 import OverlayBlocker from 'components/OverlayBlocker';
 import PluginPage from 'containers/PluginPage/Loadable';
-
 // Utils
 import auth from 'utils/auth';
 import injectReducer from 'utils/injectReducer';
 import injectSaga from 'utils/injectSaga';
-
-import { getGaStatus, getLayout } from './actions';
+import {
+  getGaStatus,
+  getLayout,
+  toggleLocaleDisplay,
+  toggleLogoutDisplay,
+} from './actions';
 import reducer from './reducer';
 import saga from './saga';
 import selectAdminPage from './selectors';
-
 import styles from './styles.scss';
 
 const PLUGINS_TO_BLOCK_PRODUCTION = ['content-type-builder', 'settings-manager'];
@@ -68,6 +66,8 @@ export class AdminPage extends React.Component {
     disableGlobalOverlayBlocker: this.props.disableGlobalOverlayBlocker,
     enableGlobalOverlayBlocker: this.props.enableGlobalOverlayBlocker,
     plugins: this.props.plugins,
+    toggleLocaleDisplay: this.props.toggleLocaleDisplay,
+    toggleLogoutDisplay: this.props.toggleLogoutDisplay,
     updatePlugin: this.props.updatePlugin,
   });
 
@@ -160,7 +160,21 @@ export class AdminPage extends React.Component {
   isUrlProtected = props =>
     !includes(props.location.pathname, get(props.plugins.toJS(), ['users-permissions', 'nonProtectedUrl']));
 
-  shouldDisplayLogout = () => auth.getToken() && this.props.hasUserPlugin && this.isUrlProtected(this.props);
+  shouldDisplayLocale = () => {
+    const { adminPage: { showLocale } } = this.props;
+
+    return showLocale;
+  }
+
+  shouldDisplayLogout = () => {
+    const { adminPage: { showLogout } } = this.props;
+
+    if (showLogout) {
+      return auth.getToken() && this.props.hasUserPlugin && this.isUrlProtected(this.props);
+    }
+
+    return showLogout;
+  }
 
   showLeftMenu = () => !includes(this.props.location.pathname, 'users-permissions/auth/');
 
@@ -200,7 +214,9 @@ export class AdminPage extends React.Component {
         )}
         <CTAWrapper>
           {this.shouldDisplayLogout() && <Logout />}
-          <LocaleToggle isLogged={this.shouldDisplayLogout() === true} />
+          {this.shouldDisplayLocale() && (
+            <LocaleToggle isLogged={this.shouldDisplayLogout() === true} />
+          )}
         </CTAWrapper>
         <div className={styles.adminPageRightWrapper} style={style}>
           {header}
@@ -227,6 +243,8 @@ AdminPage.childContextTypes = {
   disableGlobalOverlayBlocker: PropTypes.func,
   enableGlobalOverlayBlocker: PropTypes.func,
   plugins: PropTypes.object,
+  toggleLocaleDisplay: PropTypes.func,
+  toggleLogoutDisplay: PropTypes.func,
   updatePlugin: PropTypes.func,
 };
 
@@ -252,6 +270,8 @@ AdminPage.propTypes = {
   pluginLoaded: PropTypes.func.isRequired,
   plugins: PropTypes.object.isRequired,
   showGlobalAppBlocker: PropTypes.bool.isRequired,
+  toggleLocaleDisplay: PropTypes.func.isRequired,
+  toggleLogoutDisplay: PropTypes.func.isRequired,
   updatePlugin: PropTypes.func.isRequired,
 };
 
@@ -285,6 +305,12 @@ function mapDispatchToProps(dispatch) {
     },
     updatePlugin: (pluginId, updatedKey, updatedValue) => {
       dispatch(updatePlugin(pluginId, updatedKey, updatedValue));
+    },
+    toggleLocaleDisplay: () => {
+      dispatch(toggleLocaleDisplay());
+    },
+    toggleLogoutDisplay: () => {
+      dispatch(toggleLogoutDisplay());
     },
     dispatch,
   };

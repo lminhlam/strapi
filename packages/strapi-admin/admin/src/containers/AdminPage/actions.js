@@ -10,6 +10,8 @@ import {
   GET_LAYOUT,
   GET_LAYOUT_SUCCEEDED,
   GET_STRAPI_VERSION_SUCCEEDED,
+  TOGGLE_LOCALE_DISPLAY,
+  TOGGLE_LOGOUT_DISPLAY,
 } from './constants';
 
 export function getCurrEnvSucceeded(currentEnvironment) {
@@ -49,5 +51,18 @@ export function getStrapiVersionSucceeded(strapiVersion) {
   return {
     type: GET_STRAPI_VERSION_SUCCEEDED,
     strapiVersion,
+  };
+}
+
+
+export function toggleLocaleDisplay() {
+  return {
+    type: TOGGLE_LOCALE_DISPLAY,
+  };
+}
+
+export function toggleLogoutDisplay() {
+  return {
+    type: TOGGLE_LOGOUT_DISPLAY,
   };
 }
