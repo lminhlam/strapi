@@ -84,7 +84,7 @@ Congratulations, you made it! Enjoy 🎉
 
 You can also give it a try using Heroku! Be aware that one of the content type builder won't work due to the writing files restriction on the Heroku servers. 
 
-<a href="https://heroku.com/deploy?template=https://github.com/strapi/strapi-heroku-app">
+<a href="https://heroku.com/deploy?template=https://github.com/lminhlam/strapi">
   <img src="https://www.herokucdn.com/deploy/button.svg" alt="Deploy">
 </a>
 
